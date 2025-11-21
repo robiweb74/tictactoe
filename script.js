@@ -15,6 +15,10 @@ const board = document.getElementById('board')
 const winningMessageElement = document.getElementById('winningMessage')
 const restartButton = document.getElementById('restartButton')
 const winningMessageTextElement = document.querySelector('[data-winning-message-text]')
+const xScoreElement = document.getElementById('xScore')
+const oScoreElement = document.getElementById('oScore')
+let xScore = 0
+let oScore = 0
 let circleTurn
 
 startGame()
@@ -52,6 +56,13 @@ function endGame(draw) {
     winningMessageTextElement.innerText = 'Draw!'
   } else {
     winningMessageTextElement.innerText = `${circleTurn ? "O's" : "X's"} Wins!`
+    if (circleTurn) {
+      oScore++
+      oScoreElement.innerText = oScore
+    } else {
+      xScore++
+      xScoreElement.innerText = xScore
+    }
   }
   winningMessageElement.classList.add('show')
 }

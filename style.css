@@ -1,36 +1,112 @@
-*, *::after, *::before {
-    box-sizing: border-box; /* s tem določimo da so v velikosti všteto tudi border in padding*/
+*,
+*::after,
+*::before {
+    box-sizing: border-box;
 }
 
 :root {
-    --cell-size:100px;
+    --cell-size: 100px;
     --mark-size: calc(var(--cell-size) * .9);
+    --bg-color: #121212;
+    --board-bg: #1e1e1e;
+    --text-color: #ffffff;
+    --x-color: #00e5ff;
+    /* Neon Cyan */
+    --o-color: #ff4081;
+    /* Neon Pink */
+    --hover-color: rgba(255, 255, 255, 0.1);
+    --line-color: #333;
 }
 
 body {
-    margin: 0; /* odstranimo vse meje objektov*/
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: var(--text-color);
+}
+
+.game-title {
+    margin: 0;
+    margin-bottom: 20px;
+    font-size: 3.5rem;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    background: linear-gradient(to right, var(--x-color), var(--o-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+.scoreboard {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    width: 100%;
+    max-width: 400px;
+    font-size: 1.5rem;
+    margin-bottom: 30px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.score {
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.score.x-score {
+    color: var(--x-color);
+}
+
+.score.o-score {
+    color: var(--o-color);
 }
 
 .board {
-    width: 100vw;
-    height: 100vh;
-    display: grid; /* razdeli element v mrežo*/
-    justify-content: center; /* element postavi v sredino celice*/
-    align-content: center; 
-    justify-items: center; /* element postavi v sredino vsebino celice*/
+    display: grid;
+    justify-content: center;
+    align-content: center;
+    justify-items: center;
     align-items: center;
-    grid-template-columns: repeat(3, auto); /* nariše 3x3 tabelo*/
+    grid-template-columns: repeat(3, auto);
+    gap: 10px;
+    /* Creates the grid lines */
+    background-color: transparent;
 }
 
 .cell {
     width: var(--cell-size);
     height: var(--cell-size);
-    border: 1px solid black;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
     cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Remove old borders since we use gap + background */
+.cell {
+    border: none;
+}
+
+.cell:hover {
+    background-color: var(--hover-color);
+    transform: scale(1.02);
 }
 
 .cell.x,
@@ -38,87 +114,64 @@ body {
     cursor: not-allowed;
 }
 
-/* Odstranimo zunanji okvir celic*/
-.cell:first-child,
-.cell:nth-child(2),
-.cell:nth-child(3) {
-    border-top: none;
-}
-
-.cell:nth-child(3n + 1) {
-    border-left: none;
-}
-
-.cell:nth-child(3n + 3) {
-    border-right: none;
-}
-
-.cell:last-child,
-.cell:nth-child(7),
-.cell:nth-child(8) {
-    border-bottom: none;
-}
-
+/* X Styling */
 .cell.x::before,
-.cell.x::after,
-.cell.circle::before,
-.cell.circle::after {
-    background-color: black;
-}
-
-.board.x .cell:not(.x):not(.circle):hover::before,
-.board.x .cell:not(.x):not(.circle):hover::after,
-.board.circle .cell:not(.x):not(.circle):hover::before,
-.board.circle .cell:not(.x):not(.circle):hover::after {
-    background-color: lightgrey;
-}
-
-
-/* oblikujemo X z CSS*/
-.cell.x::before,
-.cell.x::after,
-.board.x .cell:not(.x):not(.circle):hover::before,
-.board.x .cell:not(.x):not(.circle):hover::after {
-    content: " ";
+.cell.x::after {
+    content: '';
     position: absolute;
     width: calc(var(--mark-size) * .15);
     height: var(--mark-size);
-    
+    background-color: var(--x-color);
+    border-radius: 2px;
+    box-shadow: 0 0 10px var(--x-color);
 }
 
-.cell.x::before,
-.board.x .cell:not(.x):not(.circle):hover::before {
+.cell.x::before {
     transform: rotate(45deg);
 }
 
-.cell.x::after,
+.cell.x::after {
+    transform: rotate(-45deg);
+}
+
+/* O Styling */
+.cell.circle::before {
+    content: '';
+    position: absolute;
+    width: var(--mark-size);
+    height: var(--mark-size);
+    border-radius: 50%;
+    border: calc(var(--mark-size) * .15) solid var(--o-color);
+    box-shadow: 0 0 10px var(--o-color), inset 0 0 10px var(--o-color);
+}
+
+/* Hover Effects for current turn */
+.board.x .cell:not(.x):not(.circle):hover::before,
+.board.x .cell:not(.x):not(.circle):hover::after {
+    content: '';
+    position: absolute;
+    width: calc(var(--mark-size) * .15);
+    height: var(--mark-size);
+    background-color: rgba(0, 229, 255, 0.3);
+    /* Faint X color */
+    transform: rotate(45deg);
+}
+
 .board.x .cell:not(.x):not(.circle):hover::after {
     transform: rotate(-45deg);
 }
 
-/* oblikujem krog z CSS*/
-.cell.circle::before,
-.cell.circle::after,
-.board.circle .cell:not(.x):not(.circle):hover::before,
-.board.circle .cell:not(.x):not(.circle):hover::after {
-    content: " ";
-    position: absolute;
-    border-radius: 50%;
-}
-
-.cell.circle::before,
 .board.circle .cell:not(.x):not(.circle):hover::before {
+    content: '';
+    position: absolute;
     width: var(--mark-size);
     height: var(--mark-size);
+    border-radius: 50%;
+    border: calc(var(--mark-size) * .15) solid rgba(255, 64, 129, 0.3);
+    /* Faint O color */
 }
 
-.cell.circle::after,
-.board.circle .cell:not(.x):not(.circle):hover::after {
-    width: calc(var(--mark-size) * .7);
-    height: calc(var(--mark-size) * .7);
-    background-color: white;
-}
-
+/* Winning Message */
 .winning-message {
     display: none;
     position: fixed;
@@ -126,28 +179,48 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, .9);
+    background-color: rgba(0, 0, 0, 0.85);
     justify-content: center;
     align-items: center;
     color: white;
-    font-size: 5rem;
+    font-size: 4rem;
     flex-direction: column;
+    backdrop-filter: blur(5px);
+    z-index: 10;
 }
 
 .winning-message button {
-    font-size: 3rem;
-    background-color: white;
-    border: 1px solid black;
-    padding: .25em .5em;
+    font-size: 2rem;
+    background: linear-gradient(to right, var(--x-color), var(--o-color));
+    border: none;
+    padding: 15px 40px;
     cursor: pointer;
+    border-radius: 50px;
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: 20px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
 }
 
 .winning-message button:hover {
-    background-color: black;
-    color: white;
-    border-color: white;
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(255, 64, 129, 0.6);
 }
 
 .winning-message.show {
     display: flex;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
